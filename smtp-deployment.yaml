@@ -1,0 +1,25 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  annotations:
+    kompose.cmd: kompose convert
+    kompose.version: 1.4.0 ()
+  creationTimestamp: null
+  labels:
+    io.kompose.service: smtp
+  name: smtp
+spec:
+  replicas: 1
+  strategy: {}
+  template:
+    metadata:
+      creationTimestamp: null
+      labels:
+        io.kompose.service: smtp
+    spec:
+      containers:
+      - image: tianon/exim4
+        name: smtp
+        resources: {}
+      restartPolicy: Always
+status: {}
