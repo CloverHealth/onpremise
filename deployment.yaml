@@ -59,10 +59,6 @@ spec:
           value: localhost
         - name: SENTRY_POSTGRES_HOST
           value: localhost 
-        - name: SENTRY_DB_USER
-          value: sentry
-        - name: SENTRY_DB_PASSWORD
-          value: "GnE+.yBxqPS'w7m<}{m.<+?RfL_w" 
       - name: cron
         image: gcr.io/eng-sandbox/sentry-onpremise:1.1
         env:
