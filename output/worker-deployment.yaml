@@ -2,41 +2,42 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert
+    kompose.cmd: kompose convert --replicas=7 -o output/
     kompose.version: 1.4.0 ()
   creationTimestamp: null
   labels:
-    io.kompose.service: base
-  name: base
+    io.kompose.service: worker
+  name: worker
 spec:
-  replicas: 1
+  replicas: 7
   strategy:
     type: Recreate
   template:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: base
+        io.kompose.service: worker
     spec:
       containers:
-      - env:
+      - args:
+        - run
+        - worker
+        env:
         - name: SENTRY_EMAIL_HOST
           value: smtp
         - name: SENTRY_MEMCACHED_HOST
           value: memcached
-        - name: SENTRY_POSTGRES_HOST
-          value: postgres
         - name: SENTRY_REDIS_HOST
           value: redis
-        image: base
-        name: base
+        image: worker
+        name: worker
         resources: {}
         volumeMounts:
         - mountPath: /var/lib/sentry/files
-          name: base-claim0
+          name: worker-claim0
       restartPolicy: Always
       volumes:
-      - name: base-claim0
+      - name: worker-claim0
         persistentVolumeClaim:
-          claimName: base-claim0
+          claimName: worker-claim0
 status: {}

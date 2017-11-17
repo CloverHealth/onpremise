@@ -2,14 +2,14 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert
+    kompose.cmd: kompose convert --replicas=7 -o output/
     kompose.version: 1.4.0 ()
   creationTimestamp: null
   labels:
     io.kompose.service: redis
   name: redis
 spec:
-  replicas: 1
+  replicas: 7
   strategy: {}
   template:
     metadata:

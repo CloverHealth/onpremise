@@ -2,43 +2,42 @@ apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
   annotations:
-    kompose.cmd: kompose convert
+    kompose.cmd: kompose convert --replicas=7 -o output/
     kompose.version: 1.4.0 ()
   creationTimestamp: null
   labels:
-    io.kompose.service: web
-  name: web
+    io.kompose.service: cron
+  name: cron
 spec:
-  replicas: 1
+  replicas: 7
   strategy:
     type: Recreate
   template:
     metadata:
       creationTimestamp: null
       labels:
-        io.kompose.service: web
+        io.kompose.service: cron
     spec:
       containers:
-      - env:
+      - args:
+        - run
+        - cron
+        env:
         - name: SENTRY_EMAIL_HOST
           value: smtp
         - name: SENTRY_MEMCACHED_HOST
           value: memcached
-        - name: SENTRY_POSTGRES_HOST
-          value: postgres
         - name: SENTRY_REDIS_HOST
           value: redis
-        image: web
-        name: web
-        ports:
-        - containerPort: 9000
+        image: cron
+        name: cron
         resources: {}
         volumeMounts:
         - mountPath: /var/lib/sentry/files
-          name: web-claim0
+          name: cron-claim0
       restartPolicy: Always
       volumes:
-      - name: web-claim0
+      - name: cron-claim0
         persistentVolumeClaim:
-          claimName: web-claim0
+          claimName: cron-claim0
 status: {}
