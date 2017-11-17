@@ -13,117 +13,68 @@ spec:
         name: sentry
     spec:
       containers:
-        - name: memcachded
-          image: memcached:1.4
-        - name: redis
-          image: redis:3.2-alpine
-        - name: smtp
-          image: tianon/exim4
-        - name: web
-          image: gcr.io/eng-sandbox/sentry-onpremise:1.1
-        - name: cloudsql-proxy
-          image: gcr.io/cloudsql-docker/gce-proxy:1.11
-          command: ["/cloud_sql_proxy", "--dir=/cloudsql",
-                    "-instances=<INSTANCE_CONNECTION_NAME>=tcp:5432",
-                    "-credential_file=/secrets/cloudsql/credentials.json"]
-          volumeMounts:
-            - name: cloudsql-instance-credentials
-              mountPath: /secrets/cloudsql
-              readOnly: true
-            - name: ssl-certs
-              mountPath: /etc/ssl/certs
-            - name: cloudsql
-              mountPath: /cloudsql
-          env:
-          - name: SENTRY_USE_SSL
-            value: '1'
-          - name: SENTRY_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                     name: sentry-secret-key 
-                     key: key 
-          - name: SENTRY_REDIS_HOST
-            value: localhost
-          - name: SENTRY_MEMCACHED_HOST
-            value: localhost
-          - name: SENTRY_EMAIL_HOST
-            value: localhost
-          - name: SENTRY_POSTGRES_HOST
-            value: 127.0.0.1:5432
-          - name: SENTRY_DB_USER
-            valueFrom:
+      - name: postgres
+        image: postgres:9.5
+        env:
+        - name: PGDATA
+          value: /var/lib/postgresql/data/pgdata
+        volumeMounts:
+          - name: postgres-data 
+            mountPath: /var/lib/postgresql/data
+      - name: memcached
+        image: memcached:1.4
+      - name: redis
+        image: redis:3.2-alpine
+      - name: smtp
+        image: tianon/exim4
+      - name: web
+        image: gcr.io/eng-sandbox/sentry-onpremise:1.1
+        env:
+        - name: SENTRY_USE_SSL
+          value: '1'
+        - name: SENTRY_SECRET_KEY
+          valueFrom:
             secretKeyRef:
-            name: cloudsql-db-credentials
-            key: username
-          - name: SENTRY_DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                     name: cloudsql-db-credentials
-                     key: password
-        - name: worker
-          image: gcr.io/eng-sandbox/sentry-onpremise:1.1
-          env:
-          - name: SENTRY_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                     name: sentry-secret-key 
-                     key: key 
-          - name: SENTRY_REDIS_HOST
-            value: localhost
-          - name: SENTRY_MEMCACHED_HOST
-            value: localhost
-          - name: SENTRY_POSTGRES_HOST
-            value: 127.0.0.1:5432
-          - name: SENTRY_DB_USER
-            valueFrom:
+              name: sentry-secret-key
+              key: sentrykey
+        - name: SENTRY_REDIS_HOST
+          value: localhost 
+        - name: SENTRY_MEMCACHED_HOST
+          value: localhost
+        - name: SENTRY_EMAIL_HOST
+          value: localhost
+        - name: SENTRY_POSTGRES_HOST
+          value: localhost 
+      - name: worker
+        image: gcr.io/eng-sandbox/sentry-onpremise:1.1
+        env:
+        - name: SENTRY_SECRET_KEY
+          valueFrom:
             secretKeyRef:
-            name: cloudsql-db-credentials
-            key: username
-          - name: SENTRY_DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                     name: cloudsql-db-credentials
-                     key: password
-          args:
-          - run
-          - worker
-        - name: cron
-          image: gcr.io/eng-sandbox/sentry-onpremise:1.1
-          volumeMounts:
-          - name: secrets
-            mountPath: /etc/nginx/conf.d/ssl
-            readOnly: true
-          env:
-          - name: SENTRY_SECRET_KEY
-            valueFrom:
-              secretKeyRef:
-                     name: sentry-secret-key
-                     key: key
-          - name: SENTRY_REDIS_HOST
-            value: localhost
-          - name: SENTRY_MEMCACHED_HOST
-            value: localhost
-          - name: SENTRY_POSTGRES_HOST
-            value: 127.0.0.1:5432
-          - name: SENTRY_DB_USER
-            valueFrom:
+              name: sentry-secret-key
+              key: sentrykey
+        - name: SENTRY_REDIS_HOST
+          value: localhost 
+        - name: SENTRY_MEMCACHED_HOST
+          value: localhost
+        - name: SENTRY_POSTGRES_HOST
+          value: localhost 
+      - name: cron
+        image: gcr.io/eng-sandbox/sentry-onpremise:1.1
+        env:
+        - name: SENTRY_SECRET_KEY
+          valueFrom:
             secretKeyRef:
-            name: cloudsql-db-credentials
-            key: username
-          - name: SENTRY_DB_PASSWORD
-            valueFrom:
-              secretKeyRef:
-                name: cloudsql-db-credentials
-                key: password
-          args:
-          - run
-          - cron
-        volumes:
-        - name: cloudsql-instance-credentials
-          secret:
-            secretName: cloudsql-instance-credentials
-        - name: cloudsql
-          emptyDir:
-        - name: ssl-certs
-          hostPath:
-            path: /etc/ssl/certs
+              name: sentry-secret-key
+              key: sentrykey
+        - name: SENTRY_REDIS_HOST
+          value: localhost 
+        - name: SENTRY_MEMCACHED_HOST
+          value: localhost
+        - name: SENTRY_POSTGRES_HOST
+          value: localhost
+
+      volumes:
+      - name: postgres-data
+        emptyDir: {}
+
