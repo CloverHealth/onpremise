@@ -1,0 +1,137 @@
+apiVersion: extensions/v1beta1
+kind: Deployment
+metadata:
+  name: sentry
+  labels:
+    name: sentry
+    env: dev
+spec:
+  replicas: 1
+  template:
+    metadata:
+      labels:
+        name: sentry
+    spec:
+      containers:
+              #      - name: postgres
+              #        image: postgres:9.5
+              #        env:
+              #        - name: PGDATA
+              #          value: /var/lib/postgresql/data/pgdata
+              #        volumeMounts:
+              #          - name: postgres-data 
+              #            mountPath: /var/lib/postgresql/data
+      - name: memcached
+        image: memcached:1.4
+      - name: redis
+        image: redis:3.2-alpine
+      - name: smtp
+        image: tianon/exim4
+      - name: web
+        image: gcr.io/eng-sandbox/sentry-onpremise:1.1
+        ports:
+        - containerPort: 9000
+        command: ["/usr/local/bin/sentry"]
+        args: ["upgrade"]
+        env:
+        - name: SENTRY_USE_SSL
+          value: '1'
+        - name: SENTRY_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: sentry-secret-key
+              key: sentrykey
+        - name: SENTRY_REDIS_HOST
+          value: localhost 
+        - name: SENTRY_MEMCACHED_HOST
+          value: localhost
+        - name: SENTRY_EMAIL_HOST
+          value: localhost
+        - name: SENTRY_POSTGRES_HOST
+          value: localhost 
+        - name: SENTRY_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: username
+        - name: SENTRY_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: password
+      - name: worker
+        image: gcr.io/eng-sandbox/sentry-onpremise:1.1
+        command: ["/usr/local/bin/sentry"]
+        args: ["upgrade"]
+        env:
+        - name: SENTRY_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: sentry-secret-key
+              key: sentrykey
+        - name: SENTRY_REDIS_HOST
+          value: localhost 
+        - name: SENTRY_MEMCACHED_HOST
+          value: localhost
+        - name: SENTRY_POSTGRES_HOST
+          value: localhost 
+        - name: SENTRY_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: username
+        - name: SENTRY_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: password
+      - name: cron
+        image: gcr.io/eng-sandbox/sentry-onpremise:1.1
+        command: ["/usr/local/bin/sentry"]
+        args: ["init"]
+        env:
+        - name: SENTRY_CONF
+          value: "/etc/sentry sentry run cron"
+        - name: SENTRY_SECRET_KEY
+          valueFrom:
+            secretKeyRef:
+              name: sentry-secret-key
+              key: sentrykey
+        - name: SENTRY_REDIS_HOST
+          value: localhost 
+        - name: SENTRY_MEMCACHED_HOST
+          value: localhost
+        - name: SENTRY_POSTGRES_HOST
+          value: localhost
+        - name: SENTRY_DB_USER
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: username
+        - name: SENTRY_DB_PASSWORD
+          valueFrom:
+            secretKeyRef:
+              name: cloudsql-db-credentials
+              key: password
+      - name: cloudsql-proxy
+        image: gcr.io/cloudsql-docker/gce-proxy:1.11
+        command: ["/cloud_sql_proxy", "--dir=/cloudsql",
+                "-instances=eng-sandbox:us-east4:sentry-dev=tcp:5432",
+                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        volumeMounts:
+          - name: cloudsql-instance-credentials
+            mountPath: /secrets/cloudsql
+            readOnly: true
+          - name: ssl-certs
+            mountPath: /etc/ssl/certs
+          - name: cloudsql
+            mountPath: /cloudsql
+      volumes:
+      - name: cloudsql-instance-credentials
+        secret:
+          secretName: cloudsql-instance-credentials
+      - name: cloudsql
+        emptyDir:
+      - name: ssl-certs
+        hostPath:
+          path: /etc/ssl/certs
