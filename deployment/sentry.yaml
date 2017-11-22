@@ -1,38 +1,31 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: sentry
+  name: sentry-onprem-deployment
   labels:
-    name: sentry
-    env: dev
+    app: sentry-onpremise
 spec:
-  replicas: 1
+  replicas: 3
+  selector:
+    matchLabels:
+      app: sentry-onpremise
   template:
     metadata:
       labels:
-        name: sentry
+       app: sentry-onpremise
     spec:
       containers:
-              #      - name: postgres
-              #        image: postgres:9.5
-              #        env:
-              #        - name: PGDATA
-              #          value: /var/lib/postgresql/data/pgdata
-              #        volumeMounts:
-              #          - name: postgres-data 
-              #            mountPath: /var/lib/postgresql/data
       - name: memcached
         image: memcached:1.4
       - name: redis
         image: redis:3.2-alpine
       - name: smtp
         image: tianon/exim4
-      - name: web
+      - name: sentry-web
         image: gcr.io/eng-sandbox/sentry-onpremise:1.1
+        args: ["run","web"]
         ports:
         - containerPort: 9000
-        command: ["/usr/local/bin/sentry"]
-        args: ["upgrade"]
         env:
         - name: SENTRY_USE_SSL
           value: '1'
@@ -59,10 +52,9 @@ spec:
             secretKeyRef:
               name: cloudsql-db-credentials
               key: password
-      - name: worker
+      - name: sentry-worker
         image: gcr.io/eng-sandbox/sentry-onpremise:1.1
-        command: ["/usr/local/bin/sentry"]
-        args: ["upgrade"]
+        args: ["run","worker"]
         env:
         - name: SENTRY_SECRET_KEY
           valueFrom:
@@ -85,10 +77,9 @@ spec:
             secretKeyRef:
               name: cloudsql-db-credentials
               key: password
-      - name: cron
+      - name: sentry-cron
         image: gcr.io/eng-sandbox/sentry-onpremise:1.1
-        command: ["/usr/local/bin/sentry"]
-        args: ["init"]
+        args: ["run", "cron"] 
         env:
         - name: SENTRY_CONF
           value: "/etc/sentry sentry run cron"
