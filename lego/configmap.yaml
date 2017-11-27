@@ -1,0 +1,8 @@
+apiVersion: v1
+metadata:
+  name: kube-lego
+  namespace: kube-lego
+data:
+  lego.email: "group-devops@cloverhealth.com"
+  lego.url: "https://acme-staging.api.letsencrypt.org/directory" 
+kind: ConfigMap

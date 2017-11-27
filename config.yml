@@ -7,7 +7,7 @@
 # Mail Server #
 ###############
 
-# mail.backend: 'smtp'  # Use dummy if you want to disable email entirely
+ mail.backend: 'dummy'  # Use dummy if you want to disable email entirely
 # mail.host: 'localhost'
 # mail.port: 25
 # mail.username: ''
@@ -34,6 +34,7 @@
 # Changing this value will result in all current sessions being invalidated.
 # A new key can be generated with `$ sentry config generate-secret-key`
 # system.secret-key: 'changeme'
+system.url-prefix: 'https://sentry.eng-sandbox.engineering'
 
 # The ``redis.clusters`` setting is used, unsurprisingly, to configure Redis
 # clusters. These clusters can be then referred to by name when configuring

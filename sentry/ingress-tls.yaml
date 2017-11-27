@@ -1,0 +1,21 @@
+apiVersion: extensions/v1beta1
+kind: Ingress
+metadata:
+  name: sentry-web
+  namespace: sentry
+  annotations:
+    kubernetes.io/tls-acme: "true"
+    kubernetes.io/ingress.class: "gce"
+spec:
+  tls:
+  - hosts:
+    - sentry.eng-sandbox.engineering 
+    secretName: sentry-tls
+  rules:
+    - host: sentry.eng-sandbox.engineering
+      http:
+        paths:
+        - path: /*
+          backend:
+            serviceName: sentry-web
+            servicePort: 80

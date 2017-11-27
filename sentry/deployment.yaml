@@ -1,14 +1,12 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: sentry-onprem-deployment
+  name: sentry-onpremise
+  namespace: sentry
   labels:
     app: sentry-onpremise
 spec:
   replicas: 3
-  selector:
-    matchLabels:
-      app: sentry-onpremise
   template:
     metadata:
       labels:
@@ -27,8 +25,6 @@ spec:
         ports:
         - containerPort: 9000
         env:
-        - name: SENTRY_USE_SSL
-          value: '1'
         - name: SENTRY_SECRET_KEY
           valueFrom:
             secretKeyRef:
@@ -81,8 +77,6 @@ spec:
         image: gcr.io/eng-sandbox/sentry-onpremise:1.1
         args: ["run", "cron"] 
         env:
-        - name: SENTRY_CONF
-          value: "/etc/sentry sentry run cron"
         - name: SENTRY_SECRET_KEY
           valueFrom:
             secretKeyRef:
