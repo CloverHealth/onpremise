@@ -1,10 +1,8 @@
 apiVersion: extensions/v1beta1
 kind: Deployment
 metadata:
-  name: sentry-onpremise
+  name: sentry
   namespace: sentry
-  labels:
-    app: sentry-onpremise
 spec:
   replicas: 3
   template:

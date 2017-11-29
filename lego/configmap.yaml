@@ -4,5 +4,5 @@ metadata:
   namespace: kube-lego
 data:
   lego.email: "group-devops@cloverhealth.com"
-  lego.url: "https://acme-staging.api.letsencrypt.org/directory" 
+  lego.url: "https://acme-staging.api.letsencrypt.org/directory"
 kind: ConfigMap

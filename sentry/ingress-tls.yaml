@@ -1,7 +1,7 @@
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
-  name: sentry-web
+  name: sentry
   namespace: sentry
   annotations:
     kubernetes.io/tls-acme: "true"
@@ -9,13 +9,13 @@ metadata:
 spec:
   tls:
   - hosts:
-    - sentry.eng-sandbox.engineering 
+    - sentry.eng-sandbox.cloverhealth.engineering 
     secretName: sentry-tls
   rules:
-    - host: sentry.eng-sandbox.engineering
+    - host: sentry.eng-sandbox.cloverhealth.engineering
       http:
         paths:
         - path: /*
           backend:
-            serviceName: sentry-web
-            servicePort: 80
+            serviceName: sentry
+            servicePort: 80 
