@@ -23,10 +23,10 @@ spec:
       - name: smtp
         image: tianon/exim4
       - name: sentry-web
-        image: gcr.io/eng-sandbox/sentry-onpremise:1.1
+        image: gcr.io/eng-sandbox/sentry-onpremise:1.0
         args: ["run","web"]
         ports:
-        - containerPort: 9000
+        - containerPort: 80
         env:
         - name: SENTRY_SECRET_KEY
           valueFrom:
@@ -52,7 +52,7 @@ spec:
               name: cloudsql-db-credentials
               key: password
       - name: sentry-worker
-        image: gcr.io/eng-sandbox/sentry-onpremise:1.1
+        image: gcr.io/eng-sandbox/sentry-onpremise:1.0
         args: ["run","worker"]
         env:
         - name: SENTRY_SECRET_KEY
@@ -77,7 +77,7 @@ spec:
               name: cloudsql-db-credentials
               key: password
       - name: sentry-cron
-        image: gcr.io/eng-sandbox/sentry-onpremise:1.1
+        image: gcr.io/eng-sandbox/sentry-onpremise:1.0
         args: ["run", "cron"] 
         env:
         - name: SENTRY_SECRET_KEY
@@ -103,9 +103,7 @@ spec:
               key: password
       - name: cloudsql-proxy
         image: gcr.io/cloudsql-docker/gce-proxy:1.11
-        command: ["/cloud_sql_proxy", "--dir=/cloudsql",
-                "-instances=eng-sandbox:us-east4:sentry-dev=tcp:5432",
-                  "-credential_file=/secrets/cloudsql/credentials.json"]
+        command: ["/cloud_sql_proxy", "--dir=/cloudsql","-instances=eng-sandbox:us-east4:sentry-dev=tcp:5432","-credential_file=/secrets/cloudsql/credentials.json"]
         volumeMounts:
           - name: cloudsql-instance-credentials
             mountPath: /secrets/cloudsql
@@ -131,10 +129,9 @@ metadata:
   name: sentry
   namespace: sentry
 spec:
-  type: NodePort
+  type: LoadBalancer 
   ports:
   - port: 80 
-    targetPort: 9000
     protocol: TCP
   selector:
     app: sentry
@@ -156,7 +153,7 @@ spec:
     - host: sentry.eng-sandbox.cloverhealth.engineering
       http:
         paths:
-        - path: /
+        - path: /_health/
           backend:
             serviceName: sentry
             servicePort: 80 
