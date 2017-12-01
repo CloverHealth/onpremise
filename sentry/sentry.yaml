@@ -55,11 +55,11 @@ spec:
           valueFrom:
             secretKeyRef:
               name: sentry-admin-user
-              key: sentry_admin_pw
-#        lifecycle:
-#          postStart:
-#            exec:
-#              command: ["/usr/local/bin/sentry", "createuser", "${SENTRY_ADMIN_USER}", "--password","${SENTRY_ADMIN_PW}", "--superuser"]
+              key: sentry-admin-pw
+        lifecycle:
+          postStart:
+            exec:
+              command: ["/usr/local/bin/sentry", "createuser", "--email ${SENTRY_ADMIN_USER}", "--password ${SENTRY_ADMIN_PW}", "--superuser"]
       - name: sentry-worker
         image: gcr.io/eng-sandbox/sentry-onpremise:1.3
         args: ["run","worker"]
