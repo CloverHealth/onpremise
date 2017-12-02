@@ -168,7 +168,9 @@ metadata:
     ingress.kubernetes.io/whitelist-source-range: 204.148.86.42/32
 spec:
   tls:
-  - secretName: tls-secret
+  - hosts:
+    - sentry.eng-sandbox.cloverhealth.engineering
+    secretName: tls-secret
   rules: 
   - host: sentry.eng-sandbox.cloverhealth.engineering
     http:
