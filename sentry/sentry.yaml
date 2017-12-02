@@ -177,6 +177,7 @@ spec:
   - host: sentry.eng-sandbox.cloverhealth.engineering
     http:
       paths:
-      - backend:
-          serviceName: sentry-service
-          servicePort: 80    
+        - path: /*
+        - backend:
+            serviceName: sentry-service
+            servicePort: 80    
