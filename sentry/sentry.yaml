@@ -19,6 +19,10 @@ spec:
       - name: sentry-web
         image: gcr.io/eng-sandbox/sentry-onpremise:1.3
         args: ["run","web"]
+        readinessProbe:
+          httpGet:
+            path: /_health
+            port: 9000
         ports:
         - containerPort: 9000
           protocol: TCP
@@ -59,7 +63,11 @@ spec:
         lifecycle:
           postStart:
             exec:
-              command: ["/usr/local/bin/sentry", "createuser", "--email ${SENTRY_ADMIN_USER}", "--password ${SENTRY_ADMIN_PW}", "--superuser"]
+              command: 
+                - "sh"
+                - "-c"
+                - >  
+                  /usr/local/bin/sentry createuser --email ${SENTRY_ADMIN_USER} --password ${SENTRY_ADMIN_PW} --superuser || true
       - name: sentry-worker
         image: gcr.io/eng-sandbox/sentry-onpremise:1.3
         args: ["run","worker"]
@@ -136,40 +144,39 @@ kind: Service
 metadata:
   name: sentry-service
 spec:
-  type: LoadBalancer 
+  type: NodePort
   selector:
     app: sentry-onpremise
-  loadBalancerSourceRanges:
-    - 204.148.86.42/32
+#  loadBalancerSourceRanges:
+#    - 204.148.86.42/32
   ports:
     - protocol: TCP
       port: 80 
       targetPort: 9000
 ---
+apiVersion: v1
+data:
+   tls.crt: LS0tLS1CRUdJTiBDRVJUSUZJQ0FURS0tLS0tCk1JSUQvRENDQXVRQ0NRQzl5MkNtNjlhUmVUQU5CZ2txaGtpRzl3MEJBUVVGQURDQnZ6RUxNQWtHQTFVRUJoTUMKVlZNeEV6QVJCZ05WQkFnVENrTmhiR2xtYjNKdWFXRXhGakFVQmdOVkJBY1REVk5oYmlCR2NtRnVZMmx6WTI4eApHakFZQmdOVkJBb1RFVU5zYjNabGNpQklaV0ZzZEdnZ1RFeERNVFF3TWdZRFZRUURFeXR6Wlc1MGNua3VaVzVuCkxYTmhibVJpYjNndVkyeHZkbVZ5YUdWaGJIUm9MbVZ1WjJsdVpXVnlhVzVuTVRFd0x3WUpLb1pJaHZjTkFRa0IKRmlKbmNtOTFjQzFsYm1kcGJtVmxjbWx1WjBCamJHOTJaWEpvWldGc2RHZ3VZMjl0TUI0WERURTNNVEl3TVRJegpORFExT1ZvWERURTRNVEl3TVRJek5EUTFPVm93Z2I4eEN6QUpCZ05WQkFZVEFsVlRNUk13RVFZRFZRUUlFd3BECllXeHBabTl5Ym1saE1SWXdGQVlEVlFRSEV3MVRZVzRnUm5KaGJtTnBjMk52TVJvd0dBWURWUVFLRXhGRGJHOTIKWlhJZ1NHVmhiSFJvSUV4TVF6RTBNRElHQTFVRUF4TXJjMlZ1ZEhKNUxtVnVaeTF6WVc1a1ltOTRMbU5zYjNabApjbWhsWVd4MGFDNWxibWRwYm1WbGNtbHVaekV4TUM4R0NTcUdTSWIzRFFFSkFSWWlaM0p2ZFhBdFpXNW5hVzVsClpYSnBibWRBWTJ4dmRtVnlhR1ZoYkhSb0xtTnZiVENDQVNJd0RRWUpLb1pJaHZjTkFRRUJCUUFEZ2dFUEFEQ0MKQVFvQ2dnRUJBSzhJajF3NnBJMGQ3S1FpSzI4T1IzektjbERWTDRPcy84U3dINFZQTlU1ZFFNUlFqYTB6UW5XbApqZmorUFA2cCsyRlVFeWQrT3gvWlB2RW9hRDRLQk5xZktMTUtDZUpOQ0E4WXg4eG83djBlOVNxcDJqTzQyMDg5CmJEZVIrZmlXSTVVWkZuZG1QQ2d6VHBMR2RsdEF5M1BXN3Q3Z2wzSXVNSnRWa3dKMUp2ajV6bUp6QXFPRy9nREMKZEZjNGlBb1VmZndpbktNRVBrc1g1V2prcGJPdHRoQjRYdTNaZGlMZ3ZhNEszVEY4UVRSbVJhRUVVRG1VZk8vYwpvVHE0Mk1yS0M2VkI0UnQ4UGc4elNmOVg4ZmlsajdrOWQzbjlKQkcxMGRMNGxqN3FjNmZhYzdvcHNiSHdoZmk0Ck0wSWRUdlNqSG9ZUy96ZFZWWmtWb2pZcThqVUVlczBDQXdFQUFUQU5CZ2txaGtpRzl3MEJBUVVGQUFPQ0FRRUEKSTVSTWFZUFVoL1c4MnF6SkdOOUM0OElheWxsM3FpSXYrZGgxZTgvRVEwNzA1Z2hkb2lkU3pZMTUyWWFaZnQzMApZMmJXZ0dJcmFiT3FpMUloaDhuaDlQZHppRlIyQUtrbGlQYkdXdjdHdUprLy9uUnh0bVduNkk0N3N6VVk4VXUrCnFta2xpa3FWY0Y0MTBsMHM2VWZjalQwUXlJU3NEVkRLYU5iNkJRdytjYXYwQVlUZjFaYTlKUEFSZkhydDN4bGsKdmFJVytVQlNVaHZCdy9oa0NvWEt5S0Y0RTdjYnNWckhFRlM1VWhoS3RnNnp5Z3RUdTdEeTh1M3RUYnFDTFc1QgoyQVdZZ1JubXRnWmNuQ1M3b05rN1g0STI4ZTRTcWdTb1k1YUhWczZQck9aQ3NHazI1V0hRVmVpZFdaNnAvS1p1ClNJUVhBMWRWQjNDY0pCV2piR1BROUE9PQotLS0tLUVORCBDRVJUSUZJQ0FURS0tLS0tCg== 
+   tls.key: LS0tLS1CRUdJTiBSU0EgUFJJVkFURSBLRVktLS0tLQpNSUlFcEFJQkFBS0NBUUVBcndpUFhEcWtqUjNzcENJcmJ3NUhmTXB5VU5Vdmc2ei94TEFmaFU4MVRsMUF4RkNOCnJUTkNkYVdOK1A0OC9xbjdZVlFUSjM0N0g5ays4U2hvUGdvRTJwOG9zd29KNGswSUR4akh6R2p1L1I3MUtxbmEKTTdqYlR6MXNONUg1K0pZamxSa1dkMlk4S0ROT2tzWjJXMERMYzlidTN1Q1hjaTR3bTFXVEFuVW0rUG5PWW5NQwpvNGIrQU1KMFZ6aUlDaFI5L0NLY293UStTeGZsYU9TbHM2MjJFSGhlN2RsMkl1QzlyZ3JkTVh4Qk5HWkZvUVJRCk9aUjg3OXloT3JqWXlzb0xwVUhoRzN3K0R6TkovMWZ4K0tXUHVUMTNlZjBrRWJYUjB2aVdQdXB6cDlwenVpbXgKc2ZDRitMZ3pRaDFPOUtNZWhoTC9OMVZWbVJXaU5pcnlOUVI2elFJREFRQUJBb0lCQVFDck1MSVdRSHprVUZvOApoZmI1SFh3cHYwOWpZNzZmQ0xyM1FsTHg3WEJ6ZnAxejVGMU5BdytEUlRMQVR0aVZNdWRjWUFDRDVlQXAzQzdGCmF3SFplNjhYckFjQVpWY1pjTUhyRWcrSUN6R0RlNTNKNW1vMW9CMVBPUUg0cjl0T21IbWd2L0xMUU1DaGlOelcKalNrQlF6UTV6Z08vRk9iS2xBYVNSbllNTjB5d3dQUVdPNStMT2hYN0I4QlgwQ0NlVU1nKzZQMXExVUdEd0tQRgpSWnd4M0pXZzFVL3Npb3ZHZVZXbTR2Q1NlNGJqNURXemxra2t4Z1B5RFVqNTV2dmpXcXNGWThlclFlRkNJT29uCmtEUG9ROVA2VDBVUDBhV2xVL00yS3pXbUFHbzZZSEpiSkROeFdtbXQ0aWxsL0U3UVVnRjh6SlpRVFVGVlE0VHUKd1UxZWtjZUJBb0dCQU50aVREYlNTVUdSelo2SDZsVFRFREt0WHVtMXZwT3dJQ2hxMyt3K1Q5L3ZvbkxLcmRhZQpIeW5haW1SRXNSeHUrbUFueC93MWRrbXc1ZnNlbzc1WnJ5TWVGZk42V0NQVG52a1hUVWt5WG9IemRuMkpXTHVHClpxandDR0pIOVF1cWlOWHlEQThSNlgyOGkwRGtIRm1JdEJUYnFFVm9yaFlZOFFVbE9DRlRzRUFSQW9HQkFNdy8KUjdEUXR5Yy8ySGtmRituWWNha1R5emJRU0NZMFBJWFlWYXFvdzhVNGNaZlBvL01aT0d0Qll5Q2haNUlVQUREaApBVHRVWS9KT0hJRzhsTEZZYTdIeWhpVlhDbERlZVNZRXB3T1QzaWhPc012N1poODBYemlRNU96TCsvS0FsRUZmCmN5WmtvNVNRSUs0dTJtWUZ6bzFoZXZQWHd0Ylp5VTM0WUk4MGpJcjlBb0dBTDlsU3NpcFBYQVBIQ3lxdHkyNTEKZS9nZ1dXMFFjZm5hS2JhVnZGc2k1TDdKZWF3SEdtWkdlY1IycHNQc3RUem5VdzJhS3NJbVdKQkN1UERIMmY2SgptbWszZEhGY3hBT21Dc0l3VXlTdlJEeXJ2Vm0xaHNFYnB3RWpjdndxMEM2VHhjWVRKejVLNU9lNG42Q2hKazRRCnFQUDMwWnV4VEpTSURRMC9IdFczL1dFQ2dZQnlwQjRvTjY1bDRHY3Y3T3p1TzZmb1lBelRFbXM4emxzZVFVUXMKU3hlL2JpUU1NdWJ5UHppMHN2bmh5ZGFwWG9LUTdPcFZFOVFab0JCT0hieFVJcTRvTGxsdlFnQ3ZUWUF3ZjdJQwp4dytPRGtVYjZWcnpydUMzamxTQU9TcU1mZkU1RkVzOHhJWXdrQWxYMjBLSXV6K3BpWXFLclpOV0p0M2Yzc2JMCitwSGNQUUtCZ1FDMWc4WlMyOTREVkhTYWRPcG9TRHN5dVBkQzAvRlYvV0xWRzE3T1BuWUQ3RHJpbDFnMFNwTEcKV1htU0F0RFBsaFVCVmsrZmxPa2hTVW9MeklKdGFIWmVFYjkxVmZyQ0xIN1l4RVpGV2dTQ1hQZzZwTGlTNmdTVQpYOCtWekxHVTI1YVIrVytBT216UEJ0WEl3UmlRZmxwckVCRmpkOHJPRlR4NGNtdUY2VWc2YWc9PQotLS0tLUVORCBSU0EgUFJJVkFURSBLRVktLS0tLQo=
+kind: Secret
+metadata:
+  name: tls-secret
+  namespace: default
+type: Opaque
+---
 apiVersion: extensions/v1beta1
 kind: Ingress
 metadata:
   name: sentry-ingress
-  annotations: 
-#    kubernetes.io/tls-acme: "true"
-#    kubernetes.io/ingress.class: "gce"
-    kubernetes.io/ingress.global-static-ip-name: sentryweb-ip
-  labels:
-    app: sentry-onpremise
+  annotations:
+    ingress.kubernetes.io/whitelist-source-range: 204.148.86.42/32
 spec:
-  backend:
-    serviceName: sentryweb-backend
-    servicePort: 9000    
-#  annotations:
-#  rules:
-#  - host: sentry.eng-sandbox.cloverhealth.engineering
-#    http:
-#      paths:
-#      - path: /auth/login/
-#        backend:
-#          serviceName: sentry
-#          servicePort: 9000
-#  tls:
-#            - hosts:
-#              - sentry.eng-sandbox.cloverhealth.engineering 
-#              secretName: sentry-tls
+  tls:
+  - secretName: tls-secret
+  rules: 
+  - host: sentry.eng-sandbox.cloverhealth.engineering
+    http:
+      paths:
+      - backend:
+          serviceName: sentry-service
+          servicePort: 80    

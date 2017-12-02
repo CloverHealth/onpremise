@@ -18,7 +18,7 @@ metadata:
   name: kube-lego
   namespace: kube-lego
 spec:
- replicas: 3
+ replicas: 2
  template:
    metadata:
      labels:
