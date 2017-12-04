@@ -116,7 +116,7 @@ spec:
               key: password
       - name: cloudsql-proxy
         image: gcr.io/cloudsql-docker/gce-proxy:1.11
-        command: ["/cloud_sql_proxy", "--dir=/cloudsql","-instances=eng-sandbox:us-east4:sentry-dev=tcp:5432","-credential_file=/secrets/cloudsql/credentials.json"]
+        command: ["/cloud_sql_proxy", "--dir=/cloudsql","-instances=eng-sandbox:us-east4:sentry-onpremise-db=tcp:5432","-credential_file=/secrets/cloudsql/credentials.json"]
         volumeMounts:
           - name: cloudsql-instance-credentials
             mountPath: /secrets/cloudsql
