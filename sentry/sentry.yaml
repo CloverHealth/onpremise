@@ -140,11 +140,11 @@ kind: Service
 metadata:
   name: sentry-service
 spec:
-  type: NodePort
+  type: LoadBalancer 
   selector:
     app: sentry-onpremise
-#  loadBalancerSourceRanges:
-#    - 204.148.86.42/32
+  loadBalancerSourceRanges:
+    - 204.148.86.42/32
   ports:
     - protocol: TCP
       port: 80 
