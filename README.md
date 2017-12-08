@@ -1,4 +1,4 @@
-# Sentry On-Premise
+# Sentry On-Premise Clover fork
 
 Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
 
@@ -6,6 +6,7 @@ Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docke
 
  * Docker 1.10.0+
  * Compose 1.6.0+ _(optional)_
+ * GKE 1.7.8+
 
 ## Up and Running
 
