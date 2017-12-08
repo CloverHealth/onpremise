@@ -41,6 +41,8 @@ import os.path
 CONF_ROOT = os.path.dirname(__file__)
 env = os.environ.get
 
+SENTRY_FEATURES['organizations:sso'] = True
+
 postgres = env('SENTRY_POSTGRES_HOST') or (env('POSTGRES_PORT_5432_TCP_ADDR') and 'postgres')
 if postgres:
     DATABASES = {
