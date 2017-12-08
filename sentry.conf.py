@@ -41,7 +41,6 @@ import os.path
 CONF_ROOT = os.path.dirname(__file__)
 env = os.environ.get
 
-SENTRY_FEATURES['organizations:sso'] = True
 
 postgres = env('SENTRY_POSTGRES_HOST') or (env('POSTGRES_PORT_5432_TCP_ADDR') and 'postgres')
 if postgres:
@@ -89,6 +88,9 @@ SENTRY_USE_BIG_INTS = True
 # and thus various UI optimizations should be enabled.
 SENTRY_SINGLE_ORGANIZATION = env('SENTRY_SINGLE_ORGANIZATION', True)
 
+SENTRY_FEATURES['organizations:sso'] = True
+SENTRY_FEATURES['organizations:sso-saml2'] = True
+SENTRY_FEATURES['organizations:sso-rippling'] = True
 #########
 # Redis #
 #########
