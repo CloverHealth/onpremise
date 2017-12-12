@@ -1,2 +1,2 @@
 # Add plugins here
-#git+https://git@github.com/dreadatour/sentry-statsd.git@82716c4
+git+https://github.com/getsentry/sentry-auth-saml2.git@89a0249
