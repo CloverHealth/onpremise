@@ -1,2 +1,2 @@
 # Add plugins here
-git+https://github.com/getsentry/sentry-auth-saml2.git@89a0249
+git+https://github.com/Cloverhealth/sentry-auth-saml2.git@581db380abbe0eb5410e29ce2d6080a147d337ea
