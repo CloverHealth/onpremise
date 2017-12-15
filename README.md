@@ -1,13 +1,15 @@
-# Sentry On-Premise
+# Sentry On-Premise Clover fork
 
-Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/).
+Official bootstrap for running your own [Sentry](https://sentry.io/) with [Docker](https://www.docker.com/) and [GKE](https://cloud.google.com/kubernetes-engine/).
 
 ## Requirements
 
  * Docker 1.10.0+
  * Compose 1.6.0+ _(optional)_
+ * GKE 1.7.8+ _(optional)_
+ * [GCloud SDK]() 
 
-## Up and Running
+## Up and Running with Docker Compose
 
 Assuming you've just cloned this repository, the following steps
 will get you up and running in no time!
@@ -26,11 +28,21 @@ There may need to be modifications to the included `docker-compose.yml` file to 
 Note that as long as you have your database bind-mounted, you should
 be fine stopping and removing the containers without worry.
 
+## Up and Running with Kubernetes
+
+* git clone this repo
+* cd into this repo's directory sentry_onpremise_kubernetes/
+*  
+
+```bash
+kubectl -f create sentry/sentry.yaml
+```
+
 ## Securing Sentry with SSL/TLS
 
 If you'd like to protect your Sentry install with SSL/TLS, there are
-fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/)
-and [Nginx](http://nginx.org/).
+fantastic SSL/TLS proxies like [HAProxy](http://www.haproxy.org/), [Nginx](http://nginx.org/)
+and [Ingress-GCE](https://github.com/kubernetes/ingress-gce/blob/master/README.md#frontend-https).
 
 ## Resources
 

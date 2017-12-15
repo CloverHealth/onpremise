@@ -33,7 +33,7 @@ services:
   redis:
     restart: unless-stopped
     image: redis:3.2-alpine
-
+  
   postgres:
     restart: unless-stopped
     image: postgres:9.5

@@ -1,0 +1,6 @@
+# install gcloud tools
+# create iam role to allow for github / circleci to push to container repositories
+# vuln scanning?
+make build
+docker tag sentry-onpremise:latest gcr.io/eng-sandbox/sentry-onpremise:1.5
+gcloud docker -- push gcr.io/eng-sandbox/sentry-onpremise:1.5

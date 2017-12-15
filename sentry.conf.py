@@ -39,6 +39,10 @@ import os
 import os.path
 
 CONF_ROOT = os.path.dirname(__file__)
+env = os.environ.get
+
+SENTRY_FEATURES['organizations:sso'] = True
+SENTRY_FEATURES['organizations:sso-saml2'] = True
 
 postgres = env('SENTRY_POSTGRES_HOST') or (env('POSTGRES_PORT_5432_TCP_ADDR') and 'postgres')
 if postgres:
@@ -242,7 +246,7 @@ if env('SENTRY_USE_SSL', False):
     SOCIAL_AUTH_REDIRECT_IS_HTTPS = True
 
 SENTRY_WEB_HOST = '0.0.0.0'
-SENTRY_WEB_PORT = 9000
+SENTRY_WEB_PORT = 8080
 SENTRY_WEB_OPTIONS = {
     # 'workers': 3,  # the number of web workers
 }
