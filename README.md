@@ -32,6 +32,7 @@ be fine stopping and removing the containers without worry.
 
 ## Up and Running with GKE
 
+* Ask for IAM permissions (within the GCP project of choice) please open a JIRA ticket or if it's urgent ask in #eng-infrastructure 
 * Follow these [instructions](https://github.com/CloverHealth/documentation/blob/master/docs/sentry_on_gke.md)
 * git clone this repo
 * cd into this repo's directory sentry_onpremise/
@@ -50,6 +51,19 @@ gcloud docker -- push gcr.io/$gcp_project/sentry_onpremise:N.X
 * Paste it into the sentry.yaml [file](https://github.com/Cloverhealth/sentry_onpremise_kubernetes/master/sentry/sentry.yaml)
 * Next navigate to the sentry_onpremise_kubernetes [repo](https://github.com/Cloverhealth/sentry_onpremise_kubernetes)
 
+## Enabling SSO with Okta
+
+* See the Clover forked [sentry_auth_saml2](https://github.com/CloverHealth/sentry-auth-saml2)
+* Check the [sentry.conf.py](https://github.com/CloverHealth/sentry_onpremise/blob/master/sentry.conf.py):
+
+```python
+SENTRY_FEATURES['organizations:sso'] = True
+SENTRY_FEATURES['organizations:sso-saml2'] = True
+```
+
+* Check the [clover-sentry-onbuild-sso](https://github.com/CloverHealth/clover-sentry-onbuild-sso)
+* ensure that these are being pulled in `libxmlsec1-dev & pkg-config`
+
 ## Securing Sentry with SSL/TLS
 
 If you'd like to protect your Sentry install with SSL/TLS, there are
@@ -58,7 +72,25 @@ and [Ingress-GCE](https://github.com/kubernetes/ingress-gce/blob/master/README.m
 
 ## Sentry Resources
 
- * [Documentation](https://docs.sentry.io/server/installation/docker/)
- * [Bug Tracker](https://github.com/getsentry/onpremise)
- * [Forums](https://forum.sentry.io/c/on-premise)
- * [IRC](irc://chat.freenode.net/sentry) (chat.freenode.net, #sentry)
+* [Documentation](https://docs.sentry.io/server/installation/docker/)
+* [Bug Tracker](https://github.com/getsentry/onpremise)
+* [Forums](https://forum.sentry.io/c/on-premise)
+* [IRC](irc://chat.freenode.net/sentry) (chat.freenode.net, #sentry)
+
+## GKE Resources
+
+* [Documentation](https://cloud.google.com/kubernetes-engine/docs/)
+* [Support](https://console.cloud.google.com/support?project=eng-sandbox) # Note can be any GCP project
+* GCP Reps:
+  * Chris Kang
+  * chriskang@google.com
+  * Rebecca Gardner
+  * gardnerr@google.com
+
+## Kubernetes Resources
+
+* [Documentation](https://kubernetes.io/docs/home/)
+* [Bugs](https://github.com/kubernetes/kubernetes/issues)
+* [Slack](http://slack.k8s.io/)
+* [StackOverflow](http://stackoverflow.com/questions/tagged/kubernetes)
+* [Forums](https://groups.google.com/forum/#!forum/kubernetes-users)
